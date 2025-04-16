@@ -5,8 +5,11 @@ import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import css from 'rollup-plugin-css-only';
+import del from 'rollup-plugin-delete';
+import copy from 'rollup-plugin-copy';
 
 const production = !process.env.ROLLUP_WATCH;
+const outputDir = 'docs';
 
 function serve() {
 	let server;
@@ -59,7 +62,44 @@ export default {
 			exportConditions: ['svelte']
 		}),
 		commonjs(),
-
+		del({ targets: `${outputDir}/*` }),
+		copy({
+			targets: [
+			  { 
+				src: 'public/favicon.png', 
+				dest: outputDir
+			  },
+			  { 
+				src: 'public/global.css', 
+				dest: outputDir
+			  },
+			  { 
+				src: 'public/build/bundle.css', 
+				dest: outputDir
+			  },
+			  { 
+				src: 'public/build/bundle.js', 
+				dest: outputDir
+			  },
+			  { 
+				src: 'public/index.html', 
+				dest: outputDir,
+				transform: (contents, filename) => {
+					if(filename.match("index.html")) {
+						return contents.toString()
+						.replace('favicon.png', '/scrum_lottery/favicon.png')
+						.replace('global.css', '/scrum_lottery/global.css')
+						.replace('/build/bundle.css', '/scrum_lottery/bundle.css')
+						.replace('/build/bundle.js', '/scrum_lottery/bundle.js')
+						;
+					}
+					return contents
+				} 
+			  } // copies all files except `build`
+			],
+			copyOnce: true
+		}),
+		
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
 		!production && serve(),

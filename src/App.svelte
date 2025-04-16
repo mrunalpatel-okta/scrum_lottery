@@ -24,6 +24,10 @@
     }
   }
 
+  function removeName(index) {
+    names = names.filter((_, i) => i !== index);
+  }
+
   function clearList() {
     names = [];
     pickedName = "";
@@ -50,12 +54,24 @@
   }
   ul {
     list-style-type: none;
-    margin: 15px;
     padding: 0;
   }
+
   li {
-    margin: 15px;
-    padding: 0;
+    margin: 0.5rem 0;
+  }
+
+  li button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  li button:hover {
+    background-color: #c0392b;
   }
 </style>
 
@@ -68,8 +84,10 @@
   {#if names.length > 0}
     <h3>Names:</h3>
     <ul>
-      {#each names as name}
-        <li>{name}</li>
+      {#each names as name, index}
+        <li>{name}
+          <button on:click={() => removeName(index)} style="margin-left: 10px;">X</button>
+        </li>
       {/each}
     </ul>
 
